@@ -1,15 +1,26 @@
 # Face-Recognition-Attendance-Management-System
 ### First Import all useful libraries
+
 * import tkinter as tk
+ 
 * from tkinter import ttk
+ 
 * from tkinter import messagebox as mess
+
 * import tkinter.simpledialog as tsd
+
 * import cv2,os
+
 * import csv
+
 * import numpy as np
+
 * from PIL import Image
+
 * import pandas as pd
+
 * import datetime
+
 * import time
 
 ### Secondly Run python main.py Command in Terminal
