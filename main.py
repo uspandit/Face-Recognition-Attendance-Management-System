@@ -143,6 +143,7 @@ def clear2():
     message1.configure(text=res)
 
 #######################################################################################
+
 def TakeImages():
     check_haarcascadefile()
     columns = ['SERIAL NO.', '', 'ID', '', 'NAME']
@@ -170,23 +171,18 @@ def TakeImages():
         harcascadePath = "haarcascade_frontalface_default.xml"
         detector = cv2.CascadeClassifier(harcascadePath)
         sampleNum = 0
+        start_time = time.time()  # Start time for the 5-second delay
         while (True):
             ret, img = cam.read()
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             faces = detector.detectMultiScale(gray, 1.3, 5)
             for (x, y, w, h) in faces:
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-                # incrementing sample number
                 sampleNum = sampleNum + 1
-                # saving the captured face in the dataset folder TrainingImage
                 cv2.imwrite("TrainingImage\ " + name + "." + str(serial) + "." + Id + '.' + str(sampleNum) + ".jpg",
                             gray[y:y + h, x:x + w])
-                # display the frame
                 cv2.imshow('Taking Images', img)
-                # Automatically close the capture loop if a face is detected
                 if sampleNum > 0:
-                    cam.release()
-                    cv2.destroyAllWindows()
                     res = "Images Taken for ID : " + Id
                     row = [serial, '', Id, '', name]
                     with open('StudentDetails\StudentDetails.csv', 'a+') as csvFile:
@@ -194,8 +190,11 @@ def TakeImages():
                         writer.writerow(row)
                     csvFile.close()
                     message1.configure(text=res)
-                    return  # Exit the function
-            # wait for 100 miliseconds
+                    while time.time() - start_time < 5:
+                        pass  # Wait for 5 seconds before closing
+                    cam.release()
+                    cv2.destroyAllWindows()
+                    return
             if cv2.waitKey(100) & 0xFF == ord('q'):
                 break
         cam.release()
@@ -246,7 +245,6 @@ def getImagesAndLabels(path):
     return faces, Ids
 
 ###########################################################################################
-
 def TrackImages():
     check_haarcascadefile()
     assure_path_exists("Attendance/")
@@ -256,15 +254,16 @@ def TrackImages():
     msg = ''
     i = 0
     j = 0
-    recognizer = cv2.face.LBPHFaceRecognizer_create()  # cv2.createLBPHFaceRecognizer()
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
     exists3 = os.path.isfile("TrainingImageLabel\Trainner.yml")
     if exists3:
         recognizer.read("TrainingImageLabel\Trainner.yml")
     else:
         mess._show(title='Data Missing', message='Please click on Save Profile to reset data!!')
         return
+
     harcascadePath = "haarcascade_frontalface_default.xml"
-    faceCascade = cv2.CascadeClassifier(harcascadePath);
+    faceCascade = cv2.CascadeClassifier(harcascadePath)
 
     cam = cv2.VideoCapture(0)
     font = cv2.FONT_HERSHEY_SIMPLEX
@@ -278,6 +277,7 @@ def TrackImages():
         cv2.destroyAllWindows()
         window.destroy()
 
+    start_time = time.time()  # Start time for the 5-second delay
     while True:
         ret, im = cam.read()
         gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
@@ -285,7 +285,7 @@ def TrackImages():
         for (x, y, w, h) in faces:
             cv2.rectangle(im, (x, y), (x + w, y + h), (225, 0, 0), 2)
             serial, conf = recognizer.predict(gray[y:y + h, x:x + w])
-            if (conf < 50):
+            if conf < 50:
                 ts = time.time()
                 date = datetime.datetime.fromtimestamp(ts).strftime('%d-%m-%Y')
                 timeStamp = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
@@ -296,11 +296,9 @@ def TrackImages():
                 bb = str(aa)
                 bb = bb[2:-2]
                 attendance = [str(ID), '', bb, '', str(date), '', str(timeStamp)]
-
-                # Update the Treeview with the attendance record
                 tv.insert('', 0, text=ID, values=(bb, date, timeStamp))
-
-                # Automatically exit the loop if a face is detected
+                while time.time() - start_time < 5:
+                    pass  # Wait for 5 seconds before closing
                 cam.release()
                 cv2.destroyAllWindows()
                 res = "Attendance Taken for ID : " + ID
@@ -310,14 +308,14 @@ def TrackImages():
                     writer.writerow(attendance)
                 csvFile1.close()
                 message1.configure(text=res)
-                return  # Exit the function
+                return
 
             else:
                 Id = 'Unknown'
                 bb = str(Id)
             cv2.putText(im, str(bb), (x, y + h), font, 1, (255, 255, 255), 2)
         cv2.imshow('Taking Attendance', im)
-        if (cv2.waitKey(1) == ord('q')):
+        if cv2.waitKey(1) == ord('q'):
             break
 
     cam.release()
