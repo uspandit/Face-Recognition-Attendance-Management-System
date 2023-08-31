@@ -1,4 +1,7 @@
 # Face-Recognition-Attendance-Management-System
+
+### Automated System
+
 ### First Import all useful libraries
 
 * import tkinter as tk
