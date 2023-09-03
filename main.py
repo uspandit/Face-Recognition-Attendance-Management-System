@@ -12,6 +12,21 @@ import datetime
 import time
 
 ############################################# FUNCTIONS ################################################
+# Function to calculate the initial count
+def calculate_initial_count():
+    exists = os.path.isfile("StudentDetails\StudentDetails.csv")
+    if exists:
+        with open("StudentDetails\StudentDetails.csv", 'r') as csvFile1:
+            reader1 = csv.reader(csvFile1)
+            count = sum(1 for row in reader1) // 2 - 1
+        csvFile1.close()
+    else:
+        count = 0
+    return count
+
+# Calculate the initial count
+total_registrations = calculate_initial_count()
+
 
 def assure_path_exists(path):
     dir = os.path.dirname(path)
@@ -19,7 +34,6 @@ def assure_path_exists(path):
         os.makedirs(dir)
 
 ##################################################################################
-
 def tick():
     time_string = time.strftime('%H:%M:%S')
     clock.config(text=time_string)
@@ -218,9 +232,11 @@ def TrainImages():
         mess._show(title='No Registrations', message='Please Register someone first!!!')
         return
     recognizer.save("TrainingImageLabel\Trainner.yml")
+    global total_registrations  # Add this line to access the global variable
+    total_registrations += 1  # Increment the total registrations count
     res = "Profile Saved Successfully"
     message1.configure(text=res)
-    message.configure(text='Total Registrations till now  : ' + str(ID[0]))
+    message.configure(text='Total Registrations till now  : ' + str(total_registrations))
 
 ############################################################################################3
 
