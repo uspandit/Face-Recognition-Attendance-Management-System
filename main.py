@@ -234,6 +234,8 @@ def TrainImages():
     recognizer.save("TrainingImageLabel\Trainner.yml")
     global total_registrations  # Add this line to access the global variable
     total_registrations += 1  # Increment the total registrations count
+    clear()
+    clear2()
     res = "Profile Saved Successfully"
     message1.configure(text=res)
     message.configure(text='Total Registrations till now  : ' + str(total_registrations))
